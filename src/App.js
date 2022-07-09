@@ -1,58 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllTodos, postDeleteTodo } from "./todoSlice";
 
-function App() {
+export default function App() {
+
+  const todos = useSelector(state => state.todos.entities)
+  const loading = useSelector(state => state.todos.loading)
+  const erorrMessage = useSelector(state => state.todos.errorMessage)
+  const dispatch = useDispatch();
+
+  // after the app component first renders we need to go get the todos from the API
+  useEffect(() => {
+    dispatch(fetchAllTodos())
+  }, [dispatch])
+
+  const onDeleteClick = (idToDelete) => {
+    // also make that change on the frontend
+    dispatch(postDeleteTodo(idToDelete))
+  }
+
+  if(loading) {
+    return <p>Loading...</p>
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+    <div>
+      <ul>
+        { todos.map(todo => (
+          <li key={todo.id}>
+            { todo.text }{" "}
+            <button onClick={() => onDeleteClick(todo.id)}>
+              X
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
-
-export default App;
